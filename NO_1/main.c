@@ -5,12 +5,20 @@
 #include "TIMER1.h"
 #include "ADC.h"
 
+/**
+  ******************************************************************************
+  * @Changlog
+  * V1.10 - 20171010
+  * 交换左右转输入端口信号；
+  * 左右转信号改为支持闪光器；
+  * 修正速度显示问题、端口配置问题，增加速度修正系数；
+  * 
+  ******************************************************************************/
 
-
-//#define   LEFT   PB_IDR_IDR5==1       //左转
-//#define   RIGHT  PB_IDR_IDR4==1       //右转
-#define   LEFT   PB_IDR_IDR4==1       //左转
-#define   RIGHT  PB_IDR_IDR5==1       //右转
+#define   LEFT   PB_IDR_IDR5==1       //左转
+#define   RIGHT  PB_IDR_IDR4==1       //右转
+//#define   LEFT   PB_IDR_IDR4==1       //左转
+//#define   RIGHT  PB_IDR_IDR5==1       //右转
 #define   MORE_S PA_IDR_IDR3==0       //超速
 #define   NEAR   PD_IDR_IDR4==1       //近光
 #define   FAR    PD_IDR_IDR5==1       //远光

@@ -488,7 +488,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state>NO_1.hex</state>
+          <state>NO_1.10.hex</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -670,7 +670,7 @@
         </option>
         <option>
           <name>IlinkProgramEntryLabel</name>
-          <state></state>
+          <state>__iar_program_start</state>
         </option>
         <option>
           <name>DoFill</name>
