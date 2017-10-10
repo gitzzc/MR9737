@@ -8,6 +8,9 @@
 /**
   ******************************************************************************
   * @Changlog
+  * V1.11 - 20171010
+  * 减小左右转信号判断计时，同步闪光器
+  *
   * V1.10 - 20171010
   * 交换左右转输入端口信号；
   * 左右转信号改为支持闪光器；
@@ -309,6 +312,7 @@ __interrupt void TIM4_OVR_UIF_IRQHandler(void)//对应IAP的中断地址：0x8060
      Speed=TEMP1;
 	 if ( Speed > 25 )
 		 Speed = (unsigned short)Speed * 122 / 100;	//20170929
+		 //Speed = (unsigned short)Speed * 130 / 100;	//20171010
      HALL_CNT=0;
     
     }
@@ -327,8 +331,8 @@ __interrupt void EXTI2_Hand_Fun(void)
 
 void Init_Time2(void)
 {
-	TIM2_PSCR = 0x02;
-	TIM2_ARRH = 0x03;
+	TIM2_PSCR = 0x01;
+	TIM2_ARRH = 0x02;
 	TIM2_ARRL = 0xE8;
 	TIM2_IER  = 0x01;
 	TIM2_CR1  = 0x01;
@@ -372,5 +376,22 @@ __interrupt void TIM2_Hand_Fun(void)
 		if ( right_count == 0 )
 			Flag.RIGHT_F = 0; 
 	}	
+
+	if ( Flag.LEFT_F ){
+		if ( LEFT )
+			RAM[6] |= 0x08; 
+		else
+			RAM[6] &=~0x08; 
+	} else
+			RAM[6] &=~0x08; 
+	if ( Flag.RIGHT_F ){
+		if ( RIGHT )
+			RAM[6] |= 0x10; 
+		else
+			RAM[6] &=~0x10; 
+	} else
+			RAM[6] &=~0x10; 
+
+
 }
 
