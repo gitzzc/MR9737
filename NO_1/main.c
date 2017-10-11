@@ -8,6 +8,9 @@
 /**
   ******************************************************************************
   * @Changlog
+  * V1.12 - 20171011
+  * 增加速度修正
+  *
   * V1.11 - 20171010
   * 减小左右转信号判断计时，同步闪光器
   *
@@ -302,20 +305,23 @@ void Init_Timer4(void)
 #pragma vector=TIM4_OVR_UIF_vector//0x19
 __interrupt void TIM4_OVR_UIF_IRQHandler(void)//对应IAP的中断地址：0x8060
 {
-    TIM4_SR=0x00;
-   
-        
-    j++;
-    if(j>=30)
-    {j=0;
-     TEMP1=HALL_CNT*76/125;          //原来是*99/700，要求改为1400，每秒28个脉冲
-     Speed=TEMP1;
-	 if ( Speed > 25 )
-		 Speed = (unsigned short)Speed * 122 / 100;	//20170929
-		 //Speed = (unsigned short)Speed * 130 / 100;	//20171010
-     HALL_CNT=0;
-    
-    }
+	TIM4_SR=0x00;
+
+
+	j++;
+	if(j>=30)
+	{j=0;
+		TEMP1=HALL_CNT*76/125;          //原来是*99/700，要求改为1400，每秒28个脉冲
+		Speed=TEMP1;
+		if ( Speed < 25 )
+			Speed = (unsigned short)Speed * 122 / 100;	//20170929
+		else
+			Speed = (unsigned short)Speed * 143 / 100;	//20170929
+		if (Speed > 65)
+			Speed = 65;
+			
+		HALL_CNT=0;
+	}
 }
 ////////////////////////////////////////////////////
 void Init_EXTI2(void)
