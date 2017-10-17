@@ -8,6 +8,9 @@
 /**
   ******************************************************************************
   * @Changlog
+  * V1.13 - 20171013
+  * >24:实际车速*1.3=显示车速
+  *
   * V1.12 - 20171011
   * 增加速度修正
   *
@@ -316,7 +319,7 @@ __interrupt void TIM4_OVR_UIF_IRQHandler(void)//对应IAP的中断地址：0x8060
 		if ( Speed < 25 )
 			Speed = (unsigned short)Speed * 122 / 100;	//20170929
 		else
-			Speed = (unsigned short)Speed * 143 / 100;	//20170929
+			Speed = (unsigned short)Speed * 130 / 100;	//20171013
 		if (Speed > 65)
 			Speed = 65;
 			
