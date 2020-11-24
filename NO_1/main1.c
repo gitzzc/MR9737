@@ -8,15 +8,6 @@
 /**
   ******************************************************************************
   * @Changlog
-  * V1.13 - 20171013
-  * >24:实际车速*1.3=显示车速
-  *
-  * V1.12 - 20171011
-  * 增加速度修正
-  *
-  * V1.11 - 20171010
-  * 减小左右转信号判断计时，同步闪光器
-  *
   * V1.10 - 20171010
   * 交换左右转输入端口信号；
   * 左右转信号改为支持闪光器；
@@ -85,105 +76,125 @@ void Init_Time2(void);
 unsigned char  RAM[7];
 int main()
 {
-	GPIO_INIT();
-	B1_OLD=6;
-	delay_ms(80);
-	for(i=0;i<7;i++)
-	{RAM[i]=0xFF;}
-	DISPLAY();
-	delay_ms(40);
+  GPIO_INIT();
+  B1_OLD=6;
+  delay_ms(80);
+  for(i=0;i<7;i++)
+  {RAM[i]=0xFF;}
+  DISPLAY();
+  delay_ms(40);
   
-	delay_ms(150);
-	Num_Char(0);
-	RAM[6] &=~0xFF;
-	RAM[4] &=~0xFF;
-	RAM[5] &=~0x0F;
-	RAM[3] &=~0xFF;
-	DISPLAY();
   
-	VOLT_B1=AverageADCData(0);
-
-	if( VOLT_B1< V30)						  {Flag.B1_F=0;Flag.SERIAL1=0;B1_OLD=0;RAM[5] &=~0x01;}     //B1低于30V,T1灭，也不要流水显示了
-	if((VOLT_B1>=V30)	&&(VOLT_B1<V41)		) {Flag.B1_F=1;Flag.SERIAL1=0;B1_OLD=1;}                    //B1低于41V高于30V,T1闪烁，也不要流水显示了
-	if((VOLT_B1>=V41)	&&(VOLT_B1<V43_8)	) {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=1;	B1_OLD=2;}       //B1低于43.8V高于41V,流水显示T1
-	if((VOLT_B1>=V43_8)	&&(VOLT_B1<V46_4)	) {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=2;	B1_OLD=3;}       //B1低于43.8V高于41V,流水显示T1\T2
-	if((VOLT_B1>=V46_4)	&&(VOLT_B1<V49)		) {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=3;	B1_OLD=4;}       //B1低于43.8V高于41V,流水显示T1\T2\T3
-	if((VOLT_B1>=V49)	&&(VOLT_B1<V51_5)	) {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=4;	B1_OLD=5;}       //B1低于43.8V高于41V,流水显示T1\T2\T3\T4
-	if( VOLT_B1>=V51_5)						  {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=5;	B1_OLD=6;}       //B1V高于51.5V,流水显示T1\T2\T3\T4\T5
-
-	VOLT_B2=AverageADCData(1);
   
-	if( VOLT_B2<V30)						  {Flag.B2_F=0;Flag.SERIAL2=0;RAM[5] &=~0x02;}     //B2低于30V,T1灭，也不要流水显示了
-	if((VOLT_B2>=V30)	&&(VOLT_B2<V41)		) {Flag.B2_F=1;Flag.SERIAL2=0;}                    //B2低于41V高于30V,T1闪烁，也不要流水显示了
-	if((VOLT_B2>=V41)	&&(VOLT_B2<V43_8)	) {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=1;}       //B2低于43.8V高于41V,流水显示T1
-	if((VOLT_B2>=V43_8)	&&(VOLT_B2<V46_4)	) {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=2;}       //B2低于43.8V高于41V,流水显示T1\T2
-	if((VOLT_B2>=V46_4)	&&(VOLT_B2<V49)		) {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=3;}       //B2低于43.8V高于41V,流水显示T1\T2\T3
-	if((VOLT_B2>=V49)	&&(VOLT_B2<V51_5)	) {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=4;}       //B2低于43.8V高于41V,流水显示T1\T2\T3\T4
-	if( VOLT_B2>=V51_5)						  {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=5;}       //B2V高于51.5V,流水显示T1\T2\T3\T4\T5
-
-	Speed=0;
-	Timer1Init();
-	Init_Time2();
-	Init_EXTI2();
-	Init_Timer4();
-	asm("rim");//开全局中断
-	while(1)
-	{ 
+  
+  
+  delay_ms(150);
+    Num_Char(0);
+    RAM[6] &=~0xFF;
+    RAM[4] &=~0xFF;
+    RAM[5] &=~0x0F;
+    RAM[3] &=~0xFF;
+    DISPLAY();
+  
+  VOLT_B1=AverageADCData(0);
+ 
+  if(VOLT_B1<V30)
+     {Flag.B1_F=0;Flag.SERIAL1=0;B1_OLD=0;RAM[5] &=~0x01;}       //B1低于30V,T1灭，也不要流水显示了
+    if((VOLT_B1>=V30)&&(VOLT_B1<V41))
+     {Flag.B1_F=1;Flag.SERIAL1=0;B1_OLD=1;}                      //B1低于41V高于30V,T1闪烁，也不要流水显示了
+    if((VOLT_B1>=V41)&&(VOLT_B1<V43_8))
+     {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=1;B1_OLD=2;}       //B1低于43.8V高于41V,流水显示T1
+    if((VOLT_B1>=V43_8)&&(VOLT_B1<V46_4))
+     {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=2;B1_OLD=3;}       //B1低于43.8V高于41V,流水显示T1\T2
+    if((VOLT_B1>=V46_4)&&(VOLT_B1<V49))
+     {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=3;B1_OLD=4;}       //B1低于43.8V高于41V,流水显示T1\T2\T3
+    if((VOLT_B1>=V49)&&(VOLT_B1<V51_5))
+     {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=4;B1_OLD=5;}       //B1低于43.8V高于41V,流水显示T1\T2\T3\T4
+    if(VOLT_B1>=V51_5)
+     {Flag.B1_F=0;Flag.SERIAL1=1;B1_LIUSHUI=5;B1_OLD=6;}       //B1V高于51.5V,流水显示T1\T2\T3\T4\T5
+    
+  VOLT_B2=AverageADCData(1);
+  
+    if(VOLT_B2<V30)
+     {Flag.B2_F=0;Flag.SERIAL2=0;RAM[5] &=~0x02;}       //B2低于30V,T1灭，也不要流水显示了
+    if((VOLT_B2>=V30)&&(VOLT_B2<V41))
+     {Flag.B2_F=1;Flag.SERIAL2=0;}                      //B2低于41V高于30V,T1闪烁，也不要流水显示了
+    if((VOLT_B2>=V41)&&(VOLT_B2<V43_8))
+     {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=1;}       //B2低于43.8V高于41V,流水显示T1
+    if((VOLT_B2>=V43_8)&&(VOLT_B2<V46_4))
+     {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=2;}       //B2低于43.8V高于41V,流水显示T1\T2
+    if((VOLT_B2>=V46_4)&&(VOLT_B2<V49))
+     {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=3;}       //B2低于43.8V高于41V,流水显示T1\T2\T3
+    if((VOLT_B2>=V49)&&(VOLT_B2<V51_5))
+     {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=4;}       //B2低于43.8V高于41V,流水显示T1\T2\T3\T4
+    if(VOLT_B2>=V51_5)
+     {Flag.B2_F=0;Flag.SERIAL2=1;B2_LIUSHUI=5;}       //B2V高于51.5V,流水显示T1\T2\T3\T4\T5
+  
+  
+  
+  Speed=0;
+  Timer1Init();
+  Init_Time2();
+  Init_EXTI2();
+  Init_Timer4();
+  asm("rim");//开全局中断
+  while(1)
+  { 
     
    
-	/***********************B1电量显示**************************************/
+ /***********************B1电量显示**************************************/
    
-	if(Flag.SERIAL1==0)
-	{
-		VOLT_B1=AverageADCData(0);
-		if(OLD_B1>VOLT_B1){
-			if((OLD_B1-VOLT_B1)>250){
-				CNT_LOST1++;
-				if(CNT_LOST1<5){
-					VOLT_B1=OLD_B1;
-				}else{
-					CNT_LOST1=0;}
-			}
-		}
-		OLD_B1=VOLT_B1;
-		
-		if( VOLT_B1< V30) {Flag.B1_F=0;B1_LED=0;RAM[5] &=~0x01;RAM[3] &=~0x0F;}       //B1低于30V,T1灭，也不要流水显示了
-		if((VOLT_B1>=V30)&&(VOLT_B1<V41)){
-			if(B1_OLD<1){if((VOLT_B1-V30)>17)
-					{Flag.B1_F=1;B1_LED=1;RAM[3] &=~0x0F;}
-			} else 	{Flag.B1_F=1;B1_LED=1;RAM[3] &=~0x0F;}
-		}        //B1低于41V高于30V,T1闪烁，也不要流水显示了
-		if((VOLT_B1>=V41)&&(VOLT_B1<V43_8)){
-			if(B1_OLD<2){if((VOLT_B1-V41)>DLT)
-					{Flag.B1_F=0;B1_LED=2;RAM[5] |=0x01;RAM[3] &=~0x0F; }} 
-			else	{Flag.B1_F=0;B1_LED=2;RAM[5] |=0x01;RAM[3] &=~0x0F;}
-
-		}        //B1低于43.8V高于41V,流水显示T1
-		if((VOLT_B1>=V43_8)&&(VOLT_B1<V46_4)){
-			if(B1_OLD<3){if((VOLT_B1-V43_8)>(DLT/2))
-				{Flag.B1_F=0;B1_LED=3;RAM[5] |=0x01;RAM[3] |=0x08;RAM[3] &=~0x07;}} 
-			else{Flag.B1_F=0;B1_LED=3;RAM[5] |=0x01;RAM[3] |=0x08;RAM[3] &=~0x07;}
-		}        //B1低于43.8V高于41V,流水显示T1\T2
-		if((VOLT_B1>=V46_4)&&(VOLT_B1<V49)){
-			if(B1_OLD<4){if((VOLT_B1-V46_4)>(12))
-				{Flag.B1_F=0;B1_LED=4;RAM[5] |=0x01; RAM[3] |=0x0C;RAM[3] &=~0x03;}} 
-			else{Flag.B1_F=0;B1_LED=4;RAM[5] |=0x01; RAM[3] |=0x0C;RAM[3] &=~0x03;}
-		}       //B1低于43.8V高于41V,流水显示T1\T2\T3
-
-		if((VOLT_B1>=V49)&&(VOLT_B1<V51_5)){
-			if(B1_OLD<5){if((VOLT_B1-V49)>(12))
-				{Flag.B1_F=0;B1_LED=5;RAM[5] |=0x01; RAM[3] |=0x0E;RAM[3] &=~0x01;}} 
-			else{Flag.B1_F=0;B1_LED=5;RAM[5] |=0x01; RAM[3] |=0x0E;RAM[3] &=~0x01;}
-		}       //B1低于43.8V高于41V,流水显示T1\T2\T3\T4
-		if(VOLT_B1>=V51_5){
-			if(B1_OLD<6){if((VOLT_B1-V51_5)>(15))
-				{Flag.B1_F=0;B1_LED=6;RAM[5] |=0x01; RAM[3] |=0x0F;}} 
-			else{Flag.B1_F=0;B1_LED=6;RAM[5] |=0x01; RAM[3] |=0x0F;}
-		}       //B1V高于51.5V,流水显示T1\T2\T3\T4\T5
-		B1_OLD=B1_LED;
-		}
+    if(Flag.SERIAL1==0)
+    {
+    VOLT_B1=AverageADCData(0);
+    if(OLD_B1>VOLT_B1){if((OLD_B1-VOLT_B1)>250){CNT_LOST1++;if(CNT_LOST1<5){VOLT_B1=OLD_B1;}else{CNT_LOST1=0;}}}
+   OLD_B1=VOLT_B1;
+    if(VOLT_B1<V30)
+     {Flag.B1_F=0;B1_LED=0;RAM[5] &=~0x01;RAM[3] &=~0x0F;}       //B1低于30V,T1灭，也不要流水显示了
+    if((VOLT_B1>=V30)&&(VOLT_B1<V41))
+     {if(B1_OLD<1)
+      {if((VOLT_B1-V30)>17){Flag.B1_F=1;B1_LED=1;RAM[3] &=~0x0F;}} 
+      else
+      {Flag.B1_F=1;B1_LED=1;RAM[3] &=~0x0F;}
+     
+     }                     //B1低于41V高于30V,T1闪烁，也不要流水显示了
+  if((VOLT_B1>=V41)&&(VOLT_B1<V43_8))
+     {if(B1_OLD<2)
+      {if((VOLT_B1-V41)>DLT){Flag.B1_F=0;B1_LED=2;RAM[5] |=0x01;RAM[3] &=~0x0F; }} 
+      else
+      {Flag.B1_F=0;B1_LED=2;RAM[5] |=0x01;RAM[3] &=~0x0F;}
+     
+      }        //B1低于43.8V高于41V,流水显示T1
+  if((VOLT_B1>=V43_8)&&(VOLT_B1<V46_4))
+     {if(B1_OLD<3)
+      {if((VOLT_B1-V43_8)>(DLT/2)){Flag.B1_F=0;B1_LED=3;RAM[5] |=0x01; RAM[3] |=0x08;RAM[3] &=~0x07;}} 
+      else
+      {Flag.B1_F=0;B1_LED=3;RAM[5] |=0x01;RAM[3] |=0x08;RAM[3] &=~0x07;}
+      }        //B1低于43.8V高于41V,流水显示T1\T2
+  if((VOLT_B1>=V46_4)&&(VOLT_B1<V49))
+     {if(B1_OLD<4)
+      {if((VOLT_B1-V46_4)>(12)){Flag.B1_F=0;B1_LED=4;RAM[5] |=0x01; RAM[3] |=0x0C;RAM[3] &=~0x03;}} 
+      else
+      {Flag.B1_F=0;B1_LED=4;RAM[5] |=0x01; RAM[3] |=0x0C;RAM[3] &=~0x03;}
+      }       //B1低于43.8V高于41V,流水显示T1\T2\T3
     
-	/***********************B2电量显示**************************************/   
+  if((VOLT_B1>=V49)&&(VOLT_B1<V51_5))
+     {if(B1_OLD<5)
+      {if((VOLT_B1-V49)>(12)){Flag.B1_F=0;B1_LED=5;RAM[5] |=0x01; RAM[3] |=0x0E;RAM[3] &=~0x01;}} 
+      else
+      {Flag.B1_F=0;B1_LED=5;RAM[5] |=0x01; RAM[3] |=0x0E;RAM[3] &=~0x01;}
+      }       //B1低于43.8V高于41V,流水显示T1\T2\T3\T4
+  if(VOLT_B1>=V51_5)
+     {if(B1_OLD<6)
+      {if((VOLT_B1-V51_5)>(15)){Flag.B1_F=0;B1_LED=6;RAM[5] |=0x01; RAM[3] |=0x0F;}} 
+      else
+      {Flag.B1_F=0;B1_LED=6;RAM[5] |=0x01; RAM[3] |=0x0F;}
+      }       //B1V高于51.5V,流水显示T1\T2\T3\T4\T5
+  B1_OLD=B1_LED;
+    }
+    
+ /***********************B2电量显示**************************************/   
+    
     if(Flag.SERIAL2==0)
     {
     VOLT_B2=AverageADCData(1);
@@ -235,9 +246,9 @@ int main()
     
     //if(LEFT)  { Flag.LEFT_F=1; }   else{Flag.LEFT_F=0;}
     //if(RIGHT) { Flag.RIGHT_F=1;}   else{Flag.RIGHT_F=0;}
-    if(MORE_S){RAM[6] |=0x20;}	else{RAM[6] &=~0x20;}
-    if(NEAR)  {RAM[6] |=0x04;}  else{RAM[6] &=~0x04;}
-    if(FAR)   {RAM[6] |=0x01;}  else{RAM[6] &=~0x01;}
+    if(MORE_S){ RAM[6] |=0x20; }   else{RAM[6] &=~0x20;}
+    if(NEAR)  {RAM[6] |=0x04;}     else{RAM[6] &=~0x04;}
+    if(FAR)   {RAM[6] |=0x01;}     else{RAM[6] &=~0x01;}
     RAM[6] &=~0x02;
     RAM[4] &=~0xFF;
     RAM[5] &=~0x0C;
@@ -288,23 +299,19 @@ void Init_Timer4(void)
 #pragma vector=TIM4_OVR_UIF_vector//0x19
 __interrupt void TIM4_OVR_UIF_IRQHandler(void)//对应IAP的中断地址：0x8060
 {
-	TIM4_SR=0x00;
-
-
-	j++;
-	if(j>=30)
-	{j=0;
-		TEMP1=HALL_CNT*76/125;          //原来是*99/700，要求改为1400，每秒28个脉冲
-		Speed=TEMP1;
-		if ( Speed < 25 )
-			Speed = (unsigned short)Speed * 122 / 100;	//20170929
-		else
-			Speed = (unsigned short)Speed * 130 / 100;	//20171013
-		if (Speed > 65)
-			Speed = 65;
-			
-		HALL_CNT=0;
-	}
+    TIM4_SR=0x00;
+   
+        
+    j++;
+    if(j>=30)
+    {j=0;
+     TEMP1=HALL_CNT*76/125;          //原来是*99/700，要求改为1400，每秒28个脉冲
+     Speed=TEMP1;
+	 if ( Speed > 25 )
+		 Speed = (unsigned short)Speed * 122 / 100;	//20170929
+     HALL_CNT=0;
+    
+    }
 }
 ////////////////////////////////////////////////////
 void Init_EXTI2(void)
@@ -320,8 +327,8 @@ __interrupt void EXTI2_Hand_Fun(void)
 
 void Init_Time2(void)
 {
-	TIM2_PSCR = 0x01;
-	TIM2_ARRH = 0x02;
+	TIM2_PSCR = 0x02;
+	TIM2_ARRH = 0x03;
 	TIM2_ARRL = 0xE8;
 	TIM2_IER  = 0x01;
 	TIM2_CR1  = 0x01;
@@ -365,22 +372,5 @@ __interrupt void TIM2_Hand_Fun(void)
 		if ( right_count == 0 )
 			Flag.RIGHT_F = 0; 
 	}	
-
-	if ( Flag.LEFT_F ){
-		if ( LEFT )
-			RAM[6] |= 0x08; 
-		else
-			RAM[6] &=~0x08; 
-	} else
-			RAM[6] &=~0x08; 
-	if ( Flag.RIGHT_F ){
-		if ( RIGHT )
-			RAM[6] |= 0x10; 
-		else
-			RAM[6] &=~0x10; 
-	} else
-			RAM[6] &=~0x10; 
-
-
 }
 
